@@ -1,0 +1,24 @@
+{
+    "name": "obelaw/permit",
+    "autoload": {
+        "psr-4": {
+            "Obelaw\\Permit\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Karim Mohamed",
+            "email": "komicho1996@gmail.com"
+        }
+    ],
+    "require": {},
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Obelaw\\Permit\\PermitServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
