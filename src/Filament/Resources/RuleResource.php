@@ -4,7 +4,10 @@ namespace Obelaw\Permit\Filament\Resources;
 
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
@@ -13,14 +16,35 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Obelaw\Permit\Attributes\Permissions;
 use Obelaw\Permit\Filament\Components\Permission;
 use Obelaw\Permit\Filament\Resources\RuleResource\CreateRule;
 use Obelaw\Permit\Filament\Resources\RuleResource\EditRule;
 use Obelaw\Permit\Filament\Resources\RuleResource\ListRule;
 use Obelaw\Permit\Models\Rule;
+use Obelaw\Permit\Traits\PremitCan;
 
+#[Permissions(
+    id: 'permit.rules.viewAny',
+    title: 'Rules',
+    description: 'This rules',
+    permissions: [
+        'permit.rules.create' => 'Can Create',
+        'permit.rules.edit' => 'Can Edit',
+        'permit.rules.delete' => 'Can Delete',
+    ]
+)]
 class RuleResource extends Resource
 {
+    use PremitCan;
+
+    protected static ?array $canAccess = [
+        'can_viewAny' => 'permit.rules.viewAny',
+        'can_create' => 'permit.rules.create',
+        'can_edit' => 'permit.rules.edit',
+        'can_delete' => 'permit.rules.delete',
+    ];
+
     protected static ?string $model = Rule::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-map';
@@ -29,15 +53,27 @@ class RuleResource extends Resource
 
     public static function form(Form $form): Form
     {
+        $rule = $form->getRecord();
+
         return $form
             ->schema([
 
                 Section::make()
                     ->schema([
                         TextInput::make('name')->required(),
+
+                        Toggle::make('has_all_permissions')
+                            ->live()
+                            ->afterStateUpdated(
+                                fn ($state, Set $set) => $state ? $set('select_permissions', true) : $set('select_permissions', false)
+                            ),
+
                         Permission::make('permissions')
                             ->label('List of Permissions')
-                            ->required()
+                            ->hidden(function (Get $get) use ($rule): bool {
+                                return $get('select_permissions') != $rule->has_all_permissions;
+                            }),
+
                     ])->columns(1)
 
             ])->columns(1);

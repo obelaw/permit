@@ -14,7 +14,8 @@ return new class extends MigrationBase
         Schema::create($this->prefix . 'admin_rules', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->json('permissions');
+            $table->boolean('has_all_permissions')->default(false);
+            $table->json('permissions')->nullable();
             $table->timestamps();
         });
     }

@@ -15,10 +15,12 @@ class Rule extends ModelBase
      */
     protected $fillable = [
         'name',
+        'has_all_permissions',
         'permissions',
     ];
 
     protected $casts = [
-        'permissions' => 'array'
+        'has_all_permissions' => 'boolean',
+        'permissions' => 'array',
     ];
 }

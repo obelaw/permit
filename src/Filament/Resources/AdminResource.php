@@ -17,14 +17,35 @@ use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
+use Obelaw\Permit\Attributes\Permissions;
 use Obelaw\Permit\Filament\Resources\AdminResource\CreateAdmin;
 use Obelaw\Permit\Filament\Resources\AdminResource\EditAdmin;
 use Obelaw\Permit\Filament\Resources\AdminResource\ListAdmin;
 use Obelaw\Permit\Models\Admin;
 use Obelaw\Permit\Models\Rule;
+use Obelaw\Permit\Traits\PremitCan;
 
+#[Permissions(
+    id: 'permit.admins.viewAny',
+    title: 'Admins',
+    description: 'This admins',
+    permissions: [
+        'permit.admins.create' => 'Can Create',
+        'permit.admins.edit' => 'Can Edit',
+        'permit.admins.delete' => 'Can Delete',
+    ]
+)]
 class AdminResource extends Resource
 {
+    use PremitCan;
+
+    protected static ?array $canAccess = [
+        'can_viewAny' => 'permit.admins.viewAny',
+        'can_create' => 'permit.admins.create',
+        'can_edit' => 'permit.admins.edit',
+        'can_delete' => 'permit.admins.delete',
+    ];
+
     protected static ?string $model = Admin::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-map';

@@ -3,6 +3,7 @@
 namespace Obelaw\Permit;
 
 use Illuminate\Support\ServiceProvider;
+use Obelaw\Permit\Services\PermitService;
 
 class PermitServiceProvider extends ServiceProvider
 {
@@ -26,6 +27,8 @@ class PermitServiceProvider extends ServiceProvider
                 'model' => \Obelaw\Permit\Models\Admin::class,
             ], config('auth.providers.permit', [])),
         ]);
+
+        $this->app->singleton('obelaw.permit', PermitService::class);
     }
 
     /**
