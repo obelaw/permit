@@ -13,7 +13,19 @@ class PermitServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        config([
+            'auth.guards.permit' => array_merge([
+                'driver' => 'session',
+                'provider' => 'permit',
+            ], config('auth.guards.store', [])),
+        ]);
+
+        config([
+            'auth.providers.permit' => array_merge([
+                'driver' => 'eloquent',
+                'model' => \Obelaw\Permit\Models\Admin::class,
+            ], config('auth.providers.permit', [])),
+        ]);
     }
 
     /**
@@ -23,6 +35,6 @@ class PermitServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
     }
 }
