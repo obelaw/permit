@@ -19,7 +19,7 @@ return new class extends MigrationBase
             $table->string('password');
             $table->rememberToken();
             $table->string('lang', 2)->default('en');
-            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->boolean('is_active')->default(false);
             $table->timestamps();
         });
     }

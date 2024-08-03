@@ -17,7 +17,11 @@ class Admin extends Authenticatable
         'name',
         'email',
         'password',
-        'status',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     /**
