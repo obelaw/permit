@@ -9,8 +9,10 @@ class PermitService
 
     public function __construct()
     {
-        $this->hasAllPermissions = auth()->user()->rule->has_all_permissions;
-        $this->permissions = auth()->user()->rule->permissions;
+        $admin = auth()->guard('permit')->user();
+
+        $this->hasAllPermissions = $admin->rule->has_all_permissions;
+        $this->permissions = $admin->rule->permissions;
     }
 
     public function can($permission)
