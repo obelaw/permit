@@ -4,8 +4,8 @@ namespace Obelaw\Permit;
 
 use Filament\Panel;
 use Obelaw\Permit\Filament\Pages\Auth\Login;
-use Obelaw\Permit\Filament\Resources\AdminResource;
 use Obelaw\Permit\Filament\Resources\RuleResource;
+use Obelaw\Permit\Filament\Resources\UserResource;
 use Obelaw\Twist\Base\BaseAddon;
 
 class PermitPlugin extends BaseAddon
@@ -16,7 +16,7 @@ class PermitPlugin extends BaseAddon
             ->login(Login::class)
             ->authGuard('permit')
             ->resources([
-                AdminResource::class,
+                UserResource::class,
                 RuleResource::class,
             ]);
     }

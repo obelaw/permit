@@ -1,19 +1,19 @@
 <?php
 
-use Obelaw\Framework\Base\MigrationBase;
+use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends MigrationBase
+return new class extends Migration
 {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create($this->prefix . 'admins', function (Blueprint $table) {
+        Schema::create('permit_users', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('rule_id')->constrained($this->prefix . 'admin_rules')->cascadeOnDelete();
+            $table->foreignId('rule_id')->constrained('permit_rules')->cascadeOnDelete();
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
@@ -29,6 +29,6 @@ return new class extends MigrationBase
      */
     public function down(): void
     {
-        Schema::dropIfExists($this->prefix . 'admins');
+        Schema::dropIfExists('permit_users');
     }
 };

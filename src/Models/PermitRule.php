@@ -2,12 +2,10 @@
 
 namespace Obelaw\Permit\Models;
 
-use Obelaw\Framework\Base\ModelBase;
+use Illuminate\Database\Eloquent\Model;
 
-class Rule extends ModelBase
+class PermitRule extends Model
 {
-    protected $table = 'admin_rules';
-
     /**
      * The attributes that are mass assignable.
      *

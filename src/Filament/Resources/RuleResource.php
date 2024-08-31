@@ -21,7 +21,7 @@ use Obelaw\Permit\Filament\Components\Permission;
 use Obelaw\Permit\Filament\Resources\RuleResource\CreateRule;
 use Obelaw\Permit\Filament\Resources\RuleResource\EditRule;
 use Obelaw\Permit\Filament\Resources\RuleResource\ListRule;
-use Obelaw\Permit\Models\Rule;
+use Obelaw\Permit\Models\PermitRule;
 use Obelaw\Permit\Traits\PremitCan;
 
 #[Permissions(
@@ -45,9 +45,11 @@ class RuleResource extends Resource
         'can_delete' => 'permit.rules.delete',
     ];
 
-    protected static ?string $model = Rule::class;
+    protected static ?string $model = PermitRule::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-map';
+    protected static ?string $navigationIcon = 'heroicon-o-users';
+
+    protected static ?string $navigationLabel = 'Rules';
 
     protected static ?string $navigationGroup = 'Permit';
 
@@ -65,13 +67,13 @@ class RuleResource extends Resource
                         Toggle::make('has_all_permissions')
                             ->live()
                             ->afterStateUpdated(
-                                fn ($state, Set $set) => $state ? $set('select_permissions', true) : $set('select_permissions', false)
+                                fn($state, Set $set) => $state ? $set('select_permissions', true) : $set('select_permissions', false)
                             ),
 
                         Permission::make('permissions')
                             ->label('List of Permissions')
                             ->hidden(function (Get $get) use ($rule): bool {
-                                return $get('select_permissions') != $rule->has_all_permissions;
+                                return isset($rule->has_all_permissions) && $rule->has_all_permissions || $get('select_permissions');
                             }),
 
                     ])->columns(1)

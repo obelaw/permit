@@ -3,6 +3,7 @@
 namespace Obelaw\Permit;
 
 use Illuminate\Support\ServiceProvider;
+use Obelaw\Permit\Console\AddDefaultUserCommand;
 use Obelaw\Permit\Services\PermitService;
 
 class PermitServiceProvider extends ServiceProvider
@@ -24,7 +25,7 @@ class PermitServiceProvider extends ServiceProvider
         config([
             'auth.providers.permit' => array_merge([
                 'driver' => 'eloquent',
-                'model' => \Obelaw\Permit\Models\Admin::class,
+                'model' => \Obelaw\Permit\Models\PermitUser::class,
             ], config('auth.providers.permit', [])),
         ]);
 
@@ -38,7 +39,14 @@ class PermitServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         $this->loadViewsFrom(__DIR__ . '/../resources', 'obelaw-permit');
+
+        if ($this->app->runningInConsole()) {
+            $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+
+            $this->commands([
+                AddDefaultUserCommand::class,
+            ]);
+        }
     }
 }

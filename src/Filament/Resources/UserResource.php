@@ -18,11 +18,11 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Obelaw\Permit\Attributes\Permissions;
-use Obelaw\Permit\Filament\Resources\AdminResource\CreateAdmin;
-use Obelaw\Permit\Filament\Resources\AdminResource\EditAdmin;
-use Obelaw\Permit\Filament\Resources\AdminResource\ListAdmin;
-use Obelaw\Permit\Models\Admin;
-use Obelaw\Permit\Models\Rule;
+use Obelaw\Permit\Filament\Resources\UserResource\CreateUser;
+use Obelaw\Permit\Filament\Resources\UserResource\EditUser;
+use Obelaw\Permit\Filament\Resources\UserResource\ListUser;
+use Obelaw\Permit\Models\PermitRule;
+use Obelaw\Permit\Models\PermitUser;
 use Obelaw\Permit\Traits\PremitCan;
 
 #[Permissions(
@@ -35,7 +35,7 @@ use Obelaw\Permit\Traits\PremitCan;
         'permit.admins.delete' => 'Can Delete',
     ]
 )]
-class AdminResource extends Resource
+class UserResource extends Resource
 {
     use PremitCan;
 
@@ -46,9 +46,11 @@ class AdminResource extends Resource
         'can_delete' => 'permit.admins.delete',
     ];
 
-    protected static ?string $model = Admin::class;
+    protected static ?string $model = PermitUser::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-map';
+
+    protected static ?string $navigationLabel = 'Users';
 
     protected static ?string $navigationGroup = 'Permit';
 
@@ -62,7 +64,7 @@ class AdminResource extends Resource
                         Select::make('rule_id')
                             ->label('Rule')
                             ->required()
-                            ->options(Rule::pluck('name', 'id'))
+                            ->options(PermitRule::pluck('name', 'id'))
                             ->searchable()
                             ->columnSpan(2),
 
@@ -126,9 +128,9 @@ class AdminResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListAdmin::route('/'),
-            'create' => CreateAdmin::route('/create'),
-            'edit' => EditAdmin::route('/{record}/edit'),
+            'index' => ListUser::route('/'),
+            'create' => CreateUser::route('/create'),
+            'edit' => EditUser::route('/{record}/edit'),
         ];
     }
 }

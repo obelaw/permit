@@ -3,9 +3,9 @@
 namespace Obelaw\Permit\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Obelaw\Permit\Models\Rule;
+use Obelaw\Permit\Models\PermitRule;
 
-class Admin extends Authenticatable
+class PermitUser extends Authenticatable
 {
     /**
      * The attributes that are mass assignable.
@@ -24,20 +24,8 @@ class Admin extends Authenticatable
         'is_active' => 'boolean',
     ];
 
-    /**
-     * Create a new instance of the Model.
-     *
-     * @param array $attributes
-     */
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-
-        $this->setTable(config('obelaw.database.table_prefix', 'obelaw_') . $this->getTable());
-    }
-
     public function rule()
     {
-        return $this->hasOne(Rule::class, 'id', 'rule_id');
+        return $this->hasOne(PermitRule::class, 'id', 'rule_id');
     }
 }
