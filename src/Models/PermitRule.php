@@ -15,12 +15,14 @@ class PermitRule extends Model
         'name',
         'has_all_permissions',
         'resource_permissions',
+        'page_permissions',
         'widget_permissions',
     ];
 
     protected $casts = [
         'has_all_permissions' => 'boolean',
         'resource_permissions' => 'array',
+        'page_permissions' => 'array',
         'widget_permissions' => 'array',
     ];
 }

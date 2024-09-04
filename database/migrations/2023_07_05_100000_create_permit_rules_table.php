@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->boolean('has_all_permissions')->default(false);
             $table->json('resource_permissions')->nullable();
+            $table->json('page_permissions')->nullable();
             $table->json('widget_permissions')->nullable();
             $table->timestamps();
         });

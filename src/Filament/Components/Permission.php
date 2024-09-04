@@ -4,6 +4,7 @@ namespace Obelaw\Permit\Filament\Components;
 
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Field;
+use Obelaw\Permit\Attributes\PagePermission;
 use Obelaw\Permit\Attributes\Permissions;
 use Obelaw\Permit\Attributes\WidgetPermission;
 use ReflectionClass;
@@ -12,6 +13,7 @@ class Permission extends Field
 {
     public $component = null;
     public $permissions = [];
+    public $pagePermissions = [];
     public $widgetPermissions = [];
 
     protected string $view = 'obelaw-permit::components.permissions';
@@ -46,6 +48,28 @@ class Permission extends Field
             $make->permissions = $allPermissions;
         }
 
+        if ($component == 'pages') {
+            $collection = collect([]);
+
+            foreach ($panel->getPages() as $page) {
+                $reflection = new ReflectionClass($page);
+                $reflectionPermissions = $reflection->getAttributes(PagePermission::class);
+
+                if (isset($reflectionPermissions[0])) {
+                    $collection->push([
+                        'id' => $reflectionPermissions[0]->getArguments()['id'],
+                        'title' => $reflectionPermissions[0]->getArguments()['title'] ?? class_basename($page),
+                        'description' => $reflectionPermissions[0]->getArguments()['description'] ?? null,
+                        'category' => $reflectionPermissions[0]->getArguments()['category'] ?? 'global',
+                    ]);
+                }
+            }
+
+            $make->component = $component;
+
+            $make->pagePermissions = $collection->groupBy('category')->toArray();
+        }
+
         if ($component == 'widgets') {
             $collection = collect([]);
 
@@ -64,10 +88,9 @@ class Permission extends Field
             }
 
             $make->component = $component;
-            
+
             $make->widgetPermissions = $collection->groupBy('category')->toArray();
         }
-
 
         return $make;
     }
@@ -80,6 +103,11 @@ class Permission extends Field
     public function getPermissions()
     {
         return $this->evaluate($this->permissions);
+    }
+
+    public function getPagePermissions()
+    {
+        return $this->evaluate($this->pagePermissions);
     }
 
     public function getWidgetPermissions()

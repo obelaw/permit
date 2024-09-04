@@ -85,6 +85,12 @@ class RuleResource extends Resource
                                     ->label('List of Permissions'),
                             ]),
 
+                        Tabs\Tab::make('Pages')
+                            ->icon('heroicon-o-document')
+                            ->schema([
+                                Permission::make('page_permissions', 'pages'),
+                            ]),
+
                         Tabs\Tab::make('Widgets')
                             ->icon('heroicon-o-chart-bar')
                             ->schema([
