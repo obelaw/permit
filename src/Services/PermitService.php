@@ -12,7 +12,10 @@ class PermitService
         $admin = auth()->guard('permit')->user();
 
         $this->hasAllPermissions = $admin->rule->has_all_permissions;
-        $this->permissions = $admin->rule->permissions;
+        $this->permissions = array_merge(
+            $admin->rule->resource_permissions ?? [],
+            $admin->rule->widget_permissions ?? [],
+        );
     }
 
     public function can($permission)

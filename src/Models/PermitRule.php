@@ -14,11 +14,13 @@ class PermitRule extends Model
     protected $fillable = [
         'name',
         'has_all_permissions',
-        'permissions',
+        'resource_permissions',
+        'widget_permissions',
     ];
 
     protected $casts = [
         'has_all_permissions' => 'boolean',
-        'permissions' => 'array',
+        'resource_permissions' => 'array',
+        'widget_permissions' => 'array',
     ];
 }

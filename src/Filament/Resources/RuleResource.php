@@ -23,6 +23,7 @@ use Obelaw\Permit\Filament\Resources\RuleResource\EditRule;
 use Obelaw\Permit\Filament\Resources\RuleResource\ListRule;
 use Obelaw\Permit\Models\PermitRule;
 use Obelaw\Permit\Traits\PremitCan;
+use Filament\Forms\Components\Tabs;
 
 #[Permissions(
     id: 'permit.rules.viewAny',
@@ -70,13 +71,30 @@ class RuleResource extends Resource
                                 fn($state, Set $set) => $state ? $set('select_permissions', true) : $set('select_permissions', false)
                             ),
 
-                        Permission::make('permissions')
-                            ->label('List of Permissions')
-                            ->hidden(function (Get $get) use ($rule): bool {
-                                return isset($rule->has_all_permissions) && $rule->has_all_permissions || $get('select_permissions');
-                            }),
 
-                    ])->columns(1)
+
+                    ])->columns(1),
+
+
+                Tabs::make('permissions')
+                    ->tabs([
+                        Tabs\Tab::make('Resources')
+                            ->icon('heroicon-o-table-cells')
+                            ->schema([
+                                Permission::make('resource_permissions')
+                                    ->label('List of Permissions'),
+                            ]),
+
+                        Tabs\Tab::make('Widgets')
+                            ->icon('heroicon-o-chart-bar')
+                            ->schema([
+                                Permission::make('widget_permissions', 'widgets')
+                                    ->label('List of Permissions'),
+                            ]),
+                    ])
+                    ->hidden(function (Get $get) use ($rule): bool {
+                        return isset($rule->has_all_permissions) && $rule->has_all_permissions || $get('select_permissions');
+                    }),
 
             ])->columns(1);
     }
