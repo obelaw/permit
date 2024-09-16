@@ -25,4 +25,9 @@ class PermitService
 
         return in_array($permission, $this->permissions);
     }
+
+    public function user()
+    {
+        return auth()->guard('permit')->user();
+    }
 }
