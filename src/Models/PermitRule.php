@@ -2,9 +2,9 @@
 
 namespace Obelaw\Permit\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Obelaw\Twist\Base\BaseModel;
 
-class PermitRule extends Model
+class PermitRule extends BaseModel
 {
     /**
      * The attributes that are mass assignable.

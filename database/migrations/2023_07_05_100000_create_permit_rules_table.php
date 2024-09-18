@@ -1,17 +1,17 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Obelaw\Twist\Base\BaseMigration;
 
-return new class extends Migration
+return new class extends BaseMigration
 {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('permit_rules', function (Blueprint $table) {
+        Schema::create($this->prefix . 'permit_rules', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->boolean('has_all_permissions')->default(false);
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('permit_rules');
+        Schema::dropIfExists($this->prefix . 'permit_rules');
     }
 };

@@ -1,19 +1,19 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Obelaw\Twist\Base\BaseMigration;
 
-return new class extends Migration
+return new class extends BaseMigration
 {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('permit_users', function (Blueprint $table) {
+        Schema::create($this->prefix . 'permit_users', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('rule_id')->constrained('permit_rules')->cascadeOnDelete();
+            $table->foreignId('rule_id')->constrained($this->prefix . 'permit_rules')->cascadeOnDelete();
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('permit_users');
+        Schema::dropIfExists($this->prefix . 'permit_users');
     }
 };
