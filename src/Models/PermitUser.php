@@ -37,7 +37,18 @@ class PermitUser extends Authenticatable
         'is_active',
     ];
 
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
     protected $casts = [
+        'password' => 'hashed',
         'is_active' => 'boolean',
     ];
 
