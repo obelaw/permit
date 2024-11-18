@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Obelaw\Permit\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Hash;
-use Obelaw\Permit\Models\PermitRule;
-use Obelaw\Permit\Models\PermitUser;
+use Obelaw\Permit\Services\UserService;
 
 final class AddDefaultUserCommand extends Command
 {
@@ -32,25 +30,10 @@ final class AddDefaultUserCommand extends Command
     public function handle(): void
     {
 
-        if (!PermitUser::first()) {
-            $email = 'admin@obelaw.test';
-            $password = '123456';
-
-            $rule = PermitRule::create([
-                'name' => 'Super Admin',
-                'permissions' => ['*'],
-            ]);
-
-            PermitUser::create([
-                'rule_id' => $rule->id,
-                'name' => 'Super Admin',
-                'email' => $email,
-                'password' => Hash::make($password),
-            ]);
-
+        if ($user = (new UserService)->createUser()) {
             $this->line('<fg=white;bg=blue> Permit USER CREATED </>');
-            $this->line('Email: ' . $email);
-            $this->line('Password: ' . $password);
+            $this->line('Email: ' . $user->email);
+            $this->line('Password: ' . $user->password);
         } else {
             $this->line('<fg=black;bg=yellow> Permit HAS USER </>');
         }
