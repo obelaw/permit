@@ -2,11 +2,13 @@
 
 namespace Obelaw\Permit\Models;
 
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Obelaw\Permit\Models\PermitRule;
 use Obelaw\Twist\Facades\Twist;
 
-class PermitUser extends Authenticatable
+class PermitUser extends Authenticatable implements FilamentUser
 {
     /**
      * Create a new instance of the Model.
@@ -22,6 +24,11 @@ class PermitUser extends Authenticatable
         }
 
         $this->setTable(config('obelaw.database.table_prefix', Twist::getPrefixTable()) . $this->getTable());
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return true;
     }
 
     /**

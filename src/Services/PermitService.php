@@ -14,6 +14,7 @@ class PermitService
         $this->hasAllPermissions = $admin->rule->has_all_permissions;
         $this->permissions = array_merge(
             $admin->rule->resource_permissions ?? [],
+            $admin->rule->page_permissions ?? [],
             $admin->rule->widget_permissions ?? [],
         );
     }
