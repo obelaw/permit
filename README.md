@@ -11,7 +11,7 @@ It is a package that helps you manage user permissions that can be managed throu
 
 ## Documentation
 
-You can find the detailed documentation here in [Documentation](https://docs.obelaw.com/packages/permit.html).
+You can find the detailed documentation here in [Documentation](https://obelaw.com/docs/1.x/packages/permit.html).
 
 ## Contributing
 
