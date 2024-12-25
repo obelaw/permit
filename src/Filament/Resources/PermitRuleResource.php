@@ -3,6 +3,7 @@
 namespace Obelaw\Permit\Filament\Resources;
 
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
@@ -17,13 +18,13 @@ use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Obelaw\Permit\Attributes\Permissions;
+use Obelaw\Permit\Filament\Clusters\PermitCluster;
 use Obelaw\Permit\Filament\Components\Permission;
-use Obelaw\Permit\Filament\Resources\RuleResource\CreateRule;
-use Obelaw\Permit\Filament\Resources\RuleResource\EditRule;
-use Obelaw\Permit\Filament\Resources\RuleResource\ListRule;
+use Obelaw\Permit\Filament\Resources\PermitRuleResource\CreateRule;
+use Obelaw\Permit\Filament\Resources\PermitRuleResource\EditRule;
+use Obelaw\Permit\Filament\Resources\PermitRuleResource\ListRule;
 use Obelaw\Permit\Models\PermitRule;
 use Obelaw\Permit\Traits\PremitCan;
-use Filament\Forms\Components\Tabs;
 
 #[Permissions(
     id: 'permit.rules.viewAny',
@@ -35,7 +36,7 @@ use Filament\Forms\Components\Tabs;
         'permit.rules.delete' => 'Can Delete',
     ]
 )]
-class RuleResource extends Resource
+class PermitRuleResource extends Resource
 {
     use PremitCan;
 
@@ -47,12 +48,9 @@ class RuleResource extends Resource
     ];
 
     protected static ?string $model = PermitRule::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-users';
-
+    protected static ?string $cluster = PermitCluster::class;
+    protected static ?string $navigationIcon = 'heroicon-o-key';
     protected static ?string $navigationLabel = 'Rules';
-
-    protected static ?string $navigationGroup = 'Permit';
 
     public static function form(Form $form): Form
     {

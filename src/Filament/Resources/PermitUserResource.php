@@ -18,9 +18,10 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Obelaw\Permit\Attributes\Permissions;
-use Obelaw\Permit\Filament\Resources\UserResource\CreateUser;
-use Obelaw\Permit\Filament\Resources\UserResource\EditUser;
-use Obelaw\Permit\Filament\Resources\UserResource\ListUser;
+use Obelaw\Permit\Filament\Clusters\PermitCluster;
+use Obelaw\Permit\Filament\Resources\PermitUserResource\CreateUser;
+use Obelaw\Permit\Filament\Resources\PermitUserResource\EditUser;
+use Obelaw\Permit\Filament\Resources\PermitUserResource\ListUser;
 use Obelaw\Permit\Models\PermitRule;
 use Obelaw\Permit\Models\PermitUser;
 use Obelaw\Permit\Traits\PremitCan;
@@ -35,7 +36,7 @@ use Obelaw\Permit\Traits\PremitCan;
         'permit.admins.delete' => 'Can Delete',
     ]
 )]
-class UserResource extends Resource
+class PermitUserResource extends Resource
 {
     use PremitCan;
 
@@ -47,12 +48,9 @@ class UserResource extends Resource
     ];
 
     protected static ?string $model = PermitUser::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-map';
-
+    protected static ?string $cluster = PermitCluster::class;
+    protected static ?string $navigationIcon = 'heroicon-o-users';
     protected static ?string $navigationLabel = 'Users';
-
-    protected static ?string $navigationGroup = 'Permit';
 
     public static function form(Form $form): Form
     {
@@ -77,7 +75,7 @@ class UserResource extends Resource
                             ->columnSpan(1),
 
                         TextInput::make('password')
-                            ->required(fn (Page $livewire) => ($livewire instanceof CreateAdmin))
+                            ->required(fn(Page $livewire) => ($livewire instanceof CreateAdmin))
                             ->password()
                             ->revealable(),
 

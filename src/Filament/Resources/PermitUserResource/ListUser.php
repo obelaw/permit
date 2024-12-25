@@ -1,14 +1,14 @@
 <?php
 
-namespace Obelaw\Permit\Filament\Resources\UserResource;
+namespace Obelaw\Permit\Filament\Resources\PermitUserResource;
 
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
-use Obelaw\Permit\Filament\Resources\UserResource;
+use Obelaw\Permit\Filament\Resources\PermitUserResource;
 
 class ListUser extends ListRecords
 {
-    protected static string $resource = UserResource::class;
+    protected static string $resource = PermitUserResource::class;
 
     protected function getHeaderActions(): array
     {

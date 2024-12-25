@@ -1,13 +1,13 @@
 <?php
 
-namespace Obelaw\Permit\Filament\Resources\UserResource;
+namespace Obelaw\Permit\Filament\Resources\PermitUserResource;
 
 use Filament\Resources\Pages\EditRecord;
-use Obelaw\Permit\Filament\Resources\UserResource;
+use Obelaw\Permit\Filament\Resources\PermitUserResource;
 
 class EditUser extends EditRecord
 {
-    protected static string $resource = UserResource::class;
+    protected static string $resource = PermitUserResource::class;
 
     /**
      * @param  array<string, mixed>  $data
