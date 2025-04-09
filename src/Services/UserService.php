@@ -24,6 +24,7 @@ class UserService
                 'name' => 'Super Admin',
                 'email' => $email,
                 'password' => Hash::make($password),
+                'is_active' => true,
             ]);
         }
 
