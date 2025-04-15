@@ -25,7 +25,6 @@ use Obelaw\Permit\Filament\Clusters\PermitCluster;
 use Obelaw\Permit\Filament\Resources\PermitUserResource\CreateUser;
 use Obelaw\Permit\Filament\Resources\PermitUserResource\EditUser;
 use Obelaw\Permit\Filament\Resources\PermitUserResource\ListUser;
-use Obelaw\Permit\Languages;
 use Obelaw\Permit\Models\PermitGiverRule;
 use Obelaw\Permit\Models\PermitRule;
 use Obelaw\Permit\Models\PermitUser;
@@ -117,10 +116,6 @@ class PermitUserResource extends Resource
                             ->required(fn(Page $livewire) => ($livewire instanceof CreateAdmin))
                             ->password()
                             ->revealable(),
-
-                        Select::make('lang')
-                            ->label('Language')
-                            ->options(Languages::get()),
 
                         Toggle::make('can_create')
                             ->label('Can Create Accounts')
