@@ -25,4 +25,9 @@ class PermitRule extends BaseModel
         'page_permissions' => 'array',
         'widget_permissions' => 'array',
     ];
+
+    public function giverRules()
+    {
+        return $this->hasMany(PermitGiverRule::class, 'rule_id', 'id');
+    }
 }

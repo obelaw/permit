@@ -37,10 +37,12 @@ class PermitUser extends Authenticatable implements FilamentUser
      * @var array<int, string>
      */
     protected $fillable = [
+        'created_by',
         'rule_id',
         'name',
         'email',
         'password',
+        'can_create',
         'is_active',
     ];
 
@@ -56,11 +58,17 @@ class PermitUser extends Authenticatable implements FilamentUser
 
     protected $casts = [
         'password' => 'hashed',
+        'can_create' => 'boolean',
         'is_active' => 'boolean',
     ];
 
     public function rule()
     {
-        return $this->hasOne(PermitRule::class, 'id', 'rule_id');
+        return $this->belongsTo(PermitRule::class);
+    }
+
+    public function giverRules()
+    {
+        return $this->hasMany(PermitGiverRule::class, 'user_id', 'id');
     }
 }

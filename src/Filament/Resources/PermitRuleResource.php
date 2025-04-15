@@ -23,6 +23,7 @@ use Obelaw\Permit\Filament\Components\Permission;
 use Obelaw\Permit\Filament\Resources\PermitRuleResource\CreateRule;
 use Obelaw\Permit\Filament\Resources\PermitRuleResource\EditRule;
 use Obelaw\Permit\Filament\Resources\PermitRuleResource\ListRule;
+use Obelaw\Permit\Filament\Resources\PermitRuleResource\RelationManagers\GiverUsersRelation;
 use Obelaw\Permit\Models\PermitRule;
 use Obelaw\Permit\Traits\PremitCan;
 
@@ -127,7 +128,7 @@ class PermitRuleResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            GiverUsersRelation::class,
         ];
     }
 

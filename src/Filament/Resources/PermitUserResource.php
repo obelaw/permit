@@ -14,14 +14,19 @@ use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Obelaw\Permit\Attributes\Permissions;
+use Obelaw\Permit\Facades\Permit;
 use Obelaw\Permit\Filament\Clusters\PermitCluster;
 use Obelaw\Permit\Filament\Resources\PermitUserResource\CreateUser;
 use Obelaw\Permit\Filament\Resources\PermitUserResource\EditUser;
 use Obelaw\Permit\Filament\Resources\PermitUserResource\ListUser;
+use Obelaw\Permit\Languages;
+use Obelaw\Permit\Models\PermitGiverRule;
 use Obelaw\Permit\Models\PermitRule;
 use Obelaw\Permit\Models\PermitUser;
 use Obelaw\Permit\Traits\PremitCan;
@@ -52,6 +57,33 @@ class PermitUserResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-users';
     protected static ?string $navigationLabel = 'Users';
 
+    public static function canViewAny(): bool
+    {
+        if (auth()->user()->can_create) {
+            return true;
+        }
+
+        return Permit::can(static::$canAccess['can_viewAny']);
+    }
+
+    public static function canCreate(): bool
+    {
+        if (auth()->user()->can_create) {
+            return true;
+        }
+
+        return Permit::can(static::$canAccess['can_create']);
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        if (auth()->user()->can_create) {
+            return true;
+        }
+
+        return Permit::can(static::$canAccess['can_edit']);
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -62,7 +94,14 @@ class PermitUserResource extends Resource
                         Select::make('rule_id')
                             ->label('Rule')
                             ->required()
-                            ->options(PermitRule::pluck('name', 'id'))
+                            ->options(function () {
+                                if (!auth()->user()->rule->has_all_permissions)
+                                    return PermitGiverRule::where('user_id', auth()->user()->id)
+                                        ->get()
+                                        ->pluck('rule.name', 'rule.id');
+
+                                return PermitRule::pluck('name', 'id');
+                            })
                             ->searchable()
                             ->columnSpan(2),
 
@@ -78,6 +117,16 @@ class PermitUserResource extends Resource
                             ->required(fn(Page $livewire) => ($livewire instanceof CreateAdmin))
                             ->password()
                             ->revealable(),
+
+                        Select::make('lang')
+                            ->label('Language')
+                            ->options(Languages::get()),
+
+                        Toggle::make('can_create')
+                            ->label('Can Create Accounts')
+                            ->helperText('Allow this user to create new accounts')
+                            ->disabled(fn() => !auth()->user()->rule->has_all_permissions)
+                            ->columnSpan(span: 2),
 
                         Toggle::make('is_active')
                             ->columnSpan(2),
