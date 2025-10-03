@@ -2,6 +2,7 @@
 
 namespace Obelaw\Permit\Filament\Resources;
 
+use Filament\Facades\Filament;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -50,11 +51,16 @@ class PermitUserResource extends Resource
         'can_edit' => 'permit.admins.edit',
         'can_delete' => 'permit.admins.delete',
     ];
-
-    protected static ?string $model = PermitUser::class;
     protected static ?string $cluster = PermitCluster::class;
     protected static ?string $navigationIcon = 'heroicon-o-users';
     protected static ?string $navigationLabel = 'Users';
+
+    public static function getModel(): string
+    {
+        $defaultGuard = config('obelaw.permit.guard');
+        $guard = config("auth.guards.$defaultGuard.provider");
+        return config("auth.providers.$guard.model");
+    }
 
     public static function canViewAny(): bool
     {
@@ -94,7 +100,7 @@ class PermitUserResource extends Resource
                             ->label('Rule')
                             ->required()
                             ->options(function () {
-                                if (!auth()->user()->rule->has_all_permissions)
+                                if (!Filament::auth()->user()->authable->rule->has_all_permissions)
                                     return PermitGiverRule::where('user_id', auth()->user()->id)
                                         ->get()
                                         ->pluck('rule.name', 'rule.id');
@@ -120,7 +126,7 @@ class PermitUserResource extends Resource
                         Toggle::make('can_create')
                             ->label('Can Create Accounts')
                             ->helperText('Allow this user to create new accounts')
-                            ->disabled(fn() => !auth()->user()->rule->has_all_permissions)
+                            ->disabled(fn() => !Filament::auth()->user()->authable->rule->has_all_permissions)
                             ->columnSpan(span: 2),
 
                         Toggle::make('is_active')
@@ -134,7 +140,7 @@ class PermitUserResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('rule.name')
+                TextColumn::make('authable.rule.name')
                     ->searchable(),
 
                 TextColumn::make('name')
@@ -142,8 +148,6 @@ class PermitUserResource extends Resource
 
                 TextColumn::make('email')
                     ->searchable(),
-
-                ToggleColumn::make('is_active')
             ])
             ->filters([
                 //

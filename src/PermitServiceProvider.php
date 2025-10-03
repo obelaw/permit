@@ -29,6 +29,11 @@ class PermitServiceProvider extends ServiceProvider
             ], config('auth.providers.permit', [])),
         ]);
 
+        $this->mergeConfigFrom(
+            __DIR__ . '/../config/permit.php',
+            'obelaw.permit'
+        );
+
         $this->app->singleton('obelaw.permit', PermitService::class);
     }
 

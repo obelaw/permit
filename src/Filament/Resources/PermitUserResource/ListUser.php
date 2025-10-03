@@ -3,6 +3,7 @@
 namespace Obelaw\Permit\Filament\Resources\PermitUserResource;
 
 use Filament\Actions\CreateAction;
+use Filament\Facades\Filament;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 use Obelaw\Permit\Filament\Resources\PermitUserResource;
@@ -22,7 +23,7 @@ class ListUser extends ListRecords
     {
         $this->applyColumnSearchesToTableQuery($query);
 
-        if (!auth()->user()->rule->has_all_permissions)
+        if (!Filament::auth()->user()->authable->rule->has_all_permissions)
             $query->where('created_by', auth()->user()->id);
 
         return $query;
