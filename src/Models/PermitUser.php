@@ -2,13 +2,11 @@
 
 namespace Obelaw\Permit\Models;
 
-use Filament\Models\Contracts\FilamentUser;
-use Filament\Panel;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Obelaw\Permit\Models\PermitRule;
 use Obelaw\Twist\Facades\Twist;
 
-class PermitUser extends Authenticatable implements FilamentUser
+class PermitUser extends Authenticatable
 {
     /**
      * Create a new instance of the Model.
@@ -26,11 +24,6 @@ class PermitUser extends Authenticatable implements FilamentUser
         $this->setTable(config('obelaw.database.table_prefix', Twist::getPrefixTable()) . $this->getTable());
     }
 
-    public function canAccessPanel(Panel $panel): bool
-    {
-        return $this->is_active;
-    }
-
     /**
      * The attributes that are mass assignable.
      *
@@ -39,9 +32,6 @@ class PermitUser extends Authenticatable implements FilamentUser
     protected $fillable = [
         'created_by',
         'rule_id',
-        'name',
-        'email',
-        'password',
         'can_create',
         'is_active',
     ];
@@ -70,5 +60,10 @@ class PermitUser extends Authenticatable implements FilamentUser
     public function giverRules()
     {
         return $this->hasMany(PermitGiverRule::class, 'user_id', 'id');
+    }
+
+    public function authable()
+    {
+        return $this->morphTo();
     }
 }
