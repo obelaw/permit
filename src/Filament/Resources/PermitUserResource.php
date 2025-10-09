@@ -139,6 +139,11 @@ class PermitUserResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn($query) => $query->whereHas('authable', function ($q) {
+                if (!Filament::auth()->user()->authable->rule->has_all_permissions) {
+                    $q->whereIn('rule_id', PermitGiverRule::where('user_id', auth()->user()->id)->pluck('rule_id'));
+                }
+            })->with('authable.rule')->orderBy('created_at', 'desc'))
             ->columns([
                 TextColumn::make('authable.rule.name')
                     ->searchable(),
