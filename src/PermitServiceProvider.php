@@ -2,6 +2,7 @@
 
 namespace Obelaw\Permit;
 
+use Obelaw\Permit\Models\PermitUser;
 use Illuminate\Support\ServiceProvider;
 use Obelaw\Permit\Console\AddDefaultUserCommand;
 use Obelaw\Permit\Services\PermitService;
@@ -25,7 +26,7 @@ class PermitServiceProvider extends ServiceProvider
         config([
             'auth.providers.permit' => array_merge([
                 'driver' => 'eloquent',
-                'model' => \Obelaw\Permit\Models\PermitUser::class,
+                'model' => PermitUser::class,
             ], config('auth.providers.permit', [])),
         ]);
 

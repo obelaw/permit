@@ -2,19 +2,20 @@
 
 namespace Obelaw\Permit\Filament\Resources;
 
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Tabs;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Obelaw\Permit\Attributes\Permissions;
@@ -26,6 +27,7 @@ use Obelaw\Permit\Filament\Resources\PermitRuleResource\ListRule;
 use Obelaw\Permit\Filament\Resources\PermitRuleResource\RelationManagers\GiverUsersRelation;
 use Obelaw\Permit\Models\PermitRule;
 use Obelaw\Permit\Traits\PremitCan;
+use Obelaw\Twist\Tenancy\Concerns\HasDBTenancy;
 
 #[Permissions(
     id: 'permit.rules.viewAny',
@@ -40,6 +42,7 @@ use Obelaw\Permit\Traits\PremitCan;
 class PermitRuleResource extends Resource
 {
     use PremitCan;
+    use HasDBTenancy;
 
     protected static ?array $canAccess = [
         'can_viewAny' => 'permit.rules.viewAny',
@@ -50,15 +53,15 @@ class PermitRuleResource extends Resource
 
     protected static ?string $model = PermitRule::class;
     protected static ?string $cluster = PermitCluster::class;
-    protected static ?string $navigationIcon = 'heroicon-o-key';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-key';
     protected static ?string $navigationLabel = 'Rules';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        $rule = $form->getRecord();
+        $rule = $schema->getRecord();
 
-        return $form
-            ->schema([
+        return $schema
+            ->components([
 
                 Section::make()
                     ->schema([
@@ -77,20 +80,20 @@ class PermitRuleResource extends Resource
 
                 Tabs::make('permissions')
                     ->tabs([
-                        Tabs\Tab::make('Resources')
+                        Tab::make('Resources')
                             ->icon('heroicon-o-table-cells')
                             ->schema([
                                 Permission::make('resource_permissions')
                                     ->label('List of Permissions'),
                             ]),
 
-                        Tabs\Tab::make('Pages')
+                        Tab::make('Pages')
                             ->icon('heroicon-o-document')
                             ->schema([
                                 Permission::make('page_permissions', 'pages'),
                             ]),
 
-                        Tabs\Tab::make('Widgets')
+                        Tab::make('Widgets')
                             ->icon('heroicon-o-chart-bar')
                             ->schema([
                                 Permission::make('widget_permissions', 'widgets')
@@ -113,12 +116,12 @@ class PermitRuleResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
+            ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

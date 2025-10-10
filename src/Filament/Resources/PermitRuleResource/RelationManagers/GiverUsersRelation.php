@@ -2,11 +2,11 @@
 
 namespace Obelaw\Permit\Filament\Resources\PermitRuleResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Actions\CreateAction;
-use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Obelaw\Permit\Models\PermitUser;
@@ -14,13 +14,13 @@ use Obelaw\Permit\Models\PermitUser;
 class GiverUsersRelation extends RelationManager
 {
     protected static ?string $title = 'Giver Users';
-    protected static ?string $icon = 'heroicon-o-archive-box';
+    protected static string | \BackedEnum | null $icon = 'heroicon-o-archive-box';
     protected static string $relationship = 'giverRules';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Select::make('user_id')
                     ->label('User')
                     ->required()
@@ -49,7 +49,7 @@ class GiverUsersRelation extends RelationManager
             ->headerActions([
                 CreateAction::make(),
             ])
-            ->actions([
+            ->recordActions([
                 DeleteAction::make(),
             ]);
     }

@@ -21,7 +21,7 @@ class Permission extends Field
     public static function make(string $name, $component = 'resources'): static
     {
         $make = parent::make($name);
-        $panel = Filament::getCurrentPanel();
+        $panel = Filament::getCurrentOrDefaultPanel();
 
         $allPermissions = [];
 

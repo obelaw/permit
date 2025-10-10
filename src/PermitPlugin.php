@@ -17,7 +17,7 @@ class PermitPlugin extends BaseAddon
             ->login(Login::class)
 
             ->authGuard($defaultGuard)
-            ->authMiddleware([PermitAuthMiddleware::class])
+            // ->authMiddleware([PermitAuthMiddleware::class])
             ->discoverResources(
                 in: __DIR__ . DIRECTORY_SEPARATOR . 'Filament' . DIRECTORY_SEPARATOR . 'Resources',
                 for: 'Obelaw\\Permit\\Filament\\Resources'

@@ -28,9 +28,8 @@ class EditUser extends EditRecord
      */
     protected function mutateFormDataBeforeFill(array $data): array
     {
-        $data['rule_id'] = $this->record->authable->rule_id;
-        $data['can_create'] = $this->record->authable->can_create;
-        $data['is_active'] = $this->record->authable->is_active;
+        $data['name'] = $this->record->authable->name;
+        $data['email'] = $this->record->authable->email;
 
         return $data;
     }
@@ -39,10 +38,12 @@ class EditUser extends EditRecord
     {
         $data = $this->form->getState();
 
-        $this->record->authable->update([
-            'rule_id' => $data['rule_id'],
-            'can_create' => $data['can_create'],
-            'is_active' => $data['is_active'],
-        ]);
+        $this->record->authable->name = $data['name'];
+        $this->record->authable->email = $data['email'];
+
+        if (isset($data['password']))
+            $this->record->authable->password = $data['password'];
+
+        $this->record->authable->save();
     }
 }

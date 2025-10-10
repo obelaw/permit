@@ -2,19 +2,20 @@
 
 namespace Obelaw\Permit\Filament\Resources;
 
+use App\Models\User;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Facades\Filament;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Pages\Page;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -30,6 +31,7 @@ use Obelaw\Permit\Models\PermitGiverRule;
 use Obelaw\Permit\Models\PermitRule;
 use Obelaw\Permit\Models\PermitUser;
 use Obelaw\Permit\Traits\PremitCan;
+use Obelaw\Twist\Tenancy\Concerns\HasDBTenancy;
 
 #[Permissions(
     id: 'permit.admins.viewAny',
@@ -44,6 +46,7 @@ use Obelaw\Permit\Traits\PremitCan;
 class PermitUserResource extends Resource
 {
     use PremitCan;
+    use HasDBTenancy;
 
     protected static ?array $canAccess = [
         'can_viewAny' => 'permit.admins.viewAny',
@@ -51,16 +54,17 @@ class PermitUserResource extends Resource
         'can_edit' => 'permit.admins.edit',
         'can_delete' => 'permit.admins.delete',
     ];
+    protected static ?string $model = PermitUser::class;
     protected static ?string $cluster = PermitCluster::class;
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
     protected static ?string $navigationLabel = 'Users';
 
-    public static function getModel(): string
-    {
-        $defaultGuard = config('obelaw.permit.guard');
-        $guard = config("auth.guards.$defaultGuard.provider");
-        return config("auth.providers.$guard.model");
-    }
+    // public static function getModel(): string
+    // {
+    //     $defaultGuard = config('obelaw.permit.guard');
+    //     $guard = config("auth.guards.$defaultGuard.provider");
+    //     return config("auth.providers.$guard.model");
+    // }
 
     public static function canViewAny(): bool
     {
@@ -89,10 +93,10 @@ class PermitUserResource extends Resource
         return Permit::can(static::$canAccess['can_edit']);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
 
                 Section::make()
                     ->schema([
@@ -139,30 +143,25 @@ class PermitUserResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn($query) => $query->whereHas('authable', function ($q) {
-                if (!Filament::auth()->user()->authable->rule->has_all_permissions) {
-                    $q->whereIn('rule_id', PermitGiverRule::where('user_id', auth()->user()->id)->pluck('rule_id'));
-                }
-            })->with('authable.rule')->orderBy('created_at', 'desc'))
             ->columns([
-                TextColumn::make('authable.rule.name')
+                TextColumn::make('rule.name')
                     ->searchable(),
 
-                TextColumn::make('name')
+                TextColumn::make('authable.name')
                     ->searchable(),
 
-                TextColumn::make('email')
+                TextColumn::make('authable.email')
                     ->searchable(),
             ])
             ->filters([
                 //
             ])
-            ->actions([
+            ->recordActions([
                 ViewAction::make(),
-                EditAction::make(),
+                EditAction::make()->visible(config('obelaw.permit.user.can_create')),
                 DeleteAction::make(),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

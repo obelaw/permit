@@ -2,6 +2,7 @@
 
 namespace Obelaw\Permit\Concerns;
 
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Filament\Panel;
 use Obelaw\Permit\Models\PermitUser;
 
@@ -17,13 +18,13 @@ trait HasPermit
 
     /**
      * Get the polymorphic relationship to the PermitUser model.
-     * 
+     *
      * This method establishes a one-to-one polymorphic relationship
      * between the current model and the PermitUser model.
-     * 
+     *
      * @deprecated v1.0.0 Use permit() method instead for better naming consistency
      * @see permit()
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     * @return MorphOne
      */
     public function authable()
     {
