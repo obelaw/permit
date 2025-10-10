@@ -8,6 +8,7 @@ use Filament\Facades\Filament;
 use Filament\Forms\Components\Select;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
+use Obelaw\Permit\Events\UserSelectedEvent;
 use Obelaw\Permit\Filament\Resources\PermitUserResource;
 use Obelaw\Permit\Models\PermitRule;
 
@@ -69,6 +70,10 @@ class ListUser extends ListRecords
                         'rule_id' => $data['rule_id'],
                         'is_active' => true,
                     ]);
+
+                    event(new UserSelectedEvent(
+                        $selectedUser,
+                    ));
 
                     // Example notification
                     \Filament\Notifications\Notification::make()
