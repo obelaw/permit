@@ -27,7 +27,7 @@ use Obelaw\Permit\Filament\Resources\PermitRuleResource\ListRule;
 use Obelaw\Permit\Filament\Resources\PermitRuleResource\RelationManagers\GiverUsersRelation;
 use Obelaw\Permit\Models\PermitRule;
 use Obelaw\Permit\Traits\PremitCan;
-use Obelaw\Twist\Tenancy\Concerns\HasDBTenancy;
+use Twist\Tenancy\Concerns\HasDBTenancy;
 
 #[Permissions(
     id: 'permit.rules.viewAny',

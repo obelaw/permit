@@ -5,7 +5,7 @@ namespace Obelaw\Permit;
 use Filament\Panel;
 use Obelaw\Permit\Filament\Pages\Auth\Login;
 use Obelaw\Permit\Http\Middleware\PermitAuthMiddleware;
-use Obelaw\Twist\Base\BaseAddon;
+use Twist\Base\BaseAddon;
 
 class PermitPlugin extends BaseAddon
 {

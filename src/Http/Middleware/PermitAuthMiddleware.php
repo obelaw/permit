@@ -6,8 +6,8 @@ use Closure;
 use Filament\Facades\Filament;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
-use Obelaw\Twist\Facades\Tenancy;
-use Obelaw\Twist\Tenancy\DTO\TenantDTO;
+use Twist\Facades\Tenancy;
+use Twist\Tenancy\DTO\TenantDTO;
 use Symfony\Component\HttpFoundation\Response;
 
 class PermitAuthMiddleware

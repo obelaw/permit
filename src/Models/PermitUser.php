@@ -5,7 +5,7 @@ namespace Obelaw\Permit\Models;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Obelaw\Permit\Models\PermitRule;
 use Obelaw\Permit\Observers\PermitUserObserver;
-use Obelaw\Twist\Base\BaseModel;
+use Twist\Base\BaseModel;
 
 #[ObservedBy([PermitUserObserver::class])]
 class PermitUser extends BaseModel

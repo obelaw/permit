@@ -2,7 +2,7 @@
 
 namespace Obelaw\Permit\Models;
 
-use Obelaw\Twist\Base\BaseModel;
+use Twist\Base\BaseModel;
 
 class PermitGiverRule extends BaseModel
 {
