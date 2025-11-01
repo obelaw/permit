@@ -2,10 +2,9 @@
 
 namespace Obelaw\Permit\Filament\Resources;
 
-use App\Models\User;
+use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Facades\Filament;
@@ -16,9 +15,9 @@ use Filament\Pages\Page;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Obelaw\Permit\Attributes\Permissions;
@@ -152,9 +151,25 @@ class PermitUserResource extends Resource
 
                 TextColumn::make('authable.email')
                     ->searchable(),
+
+                ToggleColumn::make('is_active')
+                    ->label('Active')
             ])
             ->filters([
-                //
+                //add filter by user rule
+                SelectFilter::make('rule_id')
+                    ->label('Rule')
+                    ->relationship('rule', 'name')
+                    ->searchable()
+                    ->preload(),
+
+                // is_active
+                SelectFilter::make('is_active')
+                    ->label('Active Status')
+                    ->options([
+                        1 => 'Active',
+                        0 => 'Inactive',
+                    ]),
             ])
             ->recordActions([
                 ViewAction::make(),
@@ -163,7 +178,21 @@ class PermitUserResource extends Resource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    BulkAction::make('activate')
+                        ->label('Activate Selected')
+                        ->icon('heroicon-o-check-circle')
+                        ->action(fn($records) => $records->each->update(['is_active' => true]))
+                        ->deselectRecordsAfterCompletion()
+                        ->requiresConfirmation()
+                        ->color('success'),
+
+                    BulkAction::make('deactivate')
+                        ->label('Deactivate Selected')
+                        ->icon('heroicon-o-x-circle')
+                        ->action(fn($records) => $records->each->update(['is_active' => false]))
+                        ->deselectRecordsAfterCompletion()
+                        ->requiresConfirmation()
+                        ->color('danger'),
                 ]),
             ]);
     }
