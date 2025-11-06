@@ -90,13 +90,13 @@ class PermitRuleResource extends Resource
                         Tab::make('Pages')
                             ->icon('heroicon-o-document')
                             ->schema([
-                                Permission::make('page_permissions', 'pages'),
+                                Permission::make('page_permissions')->component('pages'),
                             ]),
 
                         Tab::make('Widgets')
                             ->icon('heroicon-o-chart-bar')
                             ->schema([
-                                Permission::make('widget_permissions', 'widgets')
+                                Permission::make('widget_permissions')->component('widgets')
                                     ->label('List of Permissions'),
                             ]),
                     ])

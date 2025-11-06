@@ -18,14 +18,27 @@ class Permission extends Field
 
     protected string $view = 'obelaw-permit::components.permissions';
 
-    public static function make(string $name, $component = 'resources'): static
+    // Match parent signature: Field::make(?string $name = null): static
+    public static function make(?string $name = null): static
     {
         $make = parent::make($name);
+        // Default to resources component to preserve previous behavior
+        $make->populateByComponent('resources');
+        return $make;
+    }
+
+    public function component(string $component): static
+    {
+        $this->populateByComponent($component);
+        return $this;
+    }
+
+    protected function populateByComponent(string $component): void
+    {
         $panel = Filament::getCurrentOrDefaultPanel();
 
-        $allPermissions = [];
-
-        if ($component == 'resources') {
+        if ($component === 'resources') {
+            $allPermissions = [];
             foreach ($panel->getResources() as $resource) {
                 $allPermissions[class_basename($resource)] = [];
 
@@ -44,11 +57,15 @@ class Permission extends Field
                 }
             }
 
-            $make->component = $component;
-            $make->permissions = $allPermissions;
+            $this->component = $component;
+            $this->permissions = $allPermissions;
+            // reset others
+            $this->pagePermissions = [];
+            $this->widgetPermissions = [];
+            return;
         }
 
-        if ($component == 'pages') {
+        if ($component === 'pages') {
             $collection = collect([]);
 
             foreach ($panel->getPages() as $page) {
@@ -65,12 +82,15 @@ class Permission extends Field
                 }
             }
 
-            $make->component = $component;
-
-            $make->pagePermissions = $collection->groupBy('category')->toArray();
+            $this->component = $component;
+            $this->pagePermissions = $collection->groupBy('category')->toArray();
+            // reset others
+            $this->permissions = [];
+            $this->widgetPermissions = [];
+            return;
         }
 
-        if ($component == 'widgets') {
+        if ($component === 'widgets') {
             $collection = collect([]);
 
             foreach ($panel->getWidgets() as $widget) {
@@ -87,12 +107,19 @@ class Permission extends Field
                 }
             }
 
-            $make->component = $component;
-
-            $make->widgetPermissions = $collection->groupBy('category')->toArray();
+            $this->component = $component;
+            $this->widgetPermissions = $collection->groupBy('category')->toArray();
+            // reset others
+            $this->permissions = [];
+            $this->pagePermissions = [];
+            return;
         }
 
-        return $make;
+        // Unknown component: set only the flag and clear lists
+        $this->component = $component;
+        $this->permissions = [];
+        $this->pagePermissions = [];
+        $this->widgetPermissions = [];
     }
 
     public function getComponent()
