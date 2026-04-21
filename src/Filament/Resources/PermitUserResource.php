@@ -6,7 +6,6 @@ use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
@@ -23,8 +22,10 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Obelaw\Permit\Attributes\Permissions;
 use Obelaw\Permit\Facades\Permit;
@@ -157,13 +158,13 @@ class PermitUserResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('rule.name')
-                    ->searchable(),
+                    ->label('Rule'),
 
                 TextColumn::make('authable.name')
-                    ->searchable(),
+                    ->label('Name'),
 
                 TextColumn::make('authable.email')
-                    ->searchable(),
+                    ->label('Email'),
 
                 ToggleColumn::make('is_active')
                     ->disabled(fn(?PermitUser $record): bool => static::shouldPreventSelfDeactivation() && static::isCurrentUserRecord($record))
@@ -185,6 +186,25 @@ class PermitUserResource extends Resource
                     ->searchable()
                     ->preload(),
 
+                Filter::make('email')
+                    ->label('Email')
+                    ->form([
+                        TextInput::make('email')
+                            ->label('Email')
+                            ->placeholder('Search by email'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $email = trim((string) ($data['email'] ?? ''));
+
+                        if ($email === '') {
+                            return $query;
+                        }
+
+                        return $query->whereHas('authable', fn (Builder $authableQuery): Builder =>
+                            $authableQuery->where('email', 'like', "%{$email}%")
+                        );
+                    }),
+
                 // is_active
                 SelectFilter::make('is_active')
                     ->label('Active Status')
@@ -192,6 +212,20 @@ class PermitUserResource extends Resource
                         1 => 'Active',
                         0 => 'Inactive',
                     ]),
+
+                SelectFilter::make('is_suspend')
+                    ->label('Suspended Status')
+                    ->options([
+                        '1' => 'Suspended',
+                        '0' => 'Not Suspended',
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return match ((string) ($data['value'] ?? '')) {
+                            '1' => $query->whereNotNull('is_suspend'),
+                            '0' => $query->whereNull('is_suspend'),
+                            default => $query,
+                        };
+                    }),
             ])
             ->recordActions([
                 ViewAction::make(),

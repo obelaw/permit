@@ -18,7 +18,7 @@ class PermitUsersOverview extends StatsOverviewWidget
             Stat::make('Total users', (string) ((clone $baseQuery)->count()))
                 ->color('gray')
                 ->icon('heroicon-o-users'),
-            Stat::make('Active users', (string) ((clone $baseQuery)->where('is_active', true)->count()))
+            Stat::make('Active users', (string) ((clone $baseQuery)->where('is_active', true)->whereNull('is_suspend')->count()))
                 ->color('success')
                 ->icon('heroicon-o-check-circle'),
             Stat::make('Inactive users', (string) ((clone $baseQuery)->where('is_active', false)->count()))
