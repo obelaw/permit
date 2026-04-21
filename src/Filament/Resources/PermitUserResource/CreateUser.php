@@ -44,7 +44,7 @@ class CreateUser extends CreateRecord
 
             // Create the permit relationship
             $permit = $user->permit()->create([
-                'created_by' => auth()->id(),
+                // 'created_by' => auth()->id(),
                 'rule_id' => $data['rule_id'],
                 'can_create' => $data['can_create'] ?? false,
                 'is_active' => $data['is_active'] ?? true,

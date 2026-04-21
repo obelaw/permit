@@ -20,6 +20,7 @@ class PermitUser extends BaseModel
         'rule_id',
         'can_create',
         'is_active',
+        'is_suspend',
     ];
 
     /**
@@ -36,6 +37,8 @@ class PermitUser extends BaseModel
         'password' => 'hashed',
         'can_create' => 'boolean',
         'is_active' => 'boolean',
+        'is_suspend' => 'datetime',
+        'last_active_at' => 'datetime',
     ];
 
     public function rule()

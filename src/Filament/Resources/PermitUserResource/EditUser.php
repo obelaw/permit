@@ -19,6 +19,10 @@ class EditUser extends EditRecord
             unset($data['password']);
         }
 
+        if (config('obelaw.permit.user.prevent_self_deactivation', true) && $this->record->authable?->is(auth()->user())) {
+            unset($data['is_active']);
+        }
+
         return $data;
     }
 

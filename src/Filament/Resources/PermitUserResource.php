@@ -2,6 +2,7 @@
 
 namespace Obelaw\Permit\Filament\Resources;
 
+use App\Models\User;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -118,7 +119,13 @@ class PermitUserResource extends Resource
                             ->columnSpan(1),
 
                         TextInput::make('email')
+                            ->email()
                             ->required()
+                            ->unique(
+                                table: User::class,
+                                column: 'email',
+                                ignorable: fn(?PermitUser $record): ?Model => $record?->authable,
+                            )
                             ->columnSpan(1),
 
                         TextInput::make('password')
@@ -133,6 +140,7 @@ class PermitUserResource extends Resource
                             ->columnSpan(span: 2),
 
                         Toggle::make('is_active')
+                            ->disabled(fn(?PermitUser $record): bool => static::shouldPreventSelfDeactivation() && static::isCurrentUserRecord($record))
                             ->columnSpan(2),
                     ])->columns(2)
 
@@ -153,7 +161,16 @@ class PermitUserResource extends Resource
                     ->searchable(),
 
                 ToggleColumn::make('is_active')
-                    ->label('Active')
+                    ->disabled(fn(?PermitUser $record): bool => static::shouldPreventSelfDeactivation() && static::isCurrentUserRecord($record))
+                    ->label('Active'),
+
+                ToggleColumn::make('is_suspend')
+                    ->disabled(fn(?PermitUser $record): bool => static::shouldPreventSelfDeactivation() && static::isCurrentUserRecord($record))
+                    ->getStateUsing(fn(?PermitUser $record): bool => $record?->is_suspend !== null)
+                    ->updateStateUsing(fn(?PermitUser $record, bool $state) => $record?->update([
+                        'is_suspend' => $state ? now() : null,
+                    ]))
+                    ->label('Suspended'),
             ])
             ->filters([
                 //add filter by user rule
@@ -174,14 +191,18 @@ class PermitUserResource extends Resource
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make()->visible(config('obelaw.permit.user.can_create')),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->visible(fn(?PermitUser $record): bool => !static::shouldPreventSelfDelete() || !static::isCurrentUserRecord($record)),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     BulkAction::make('activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-check-circle')
-                        ->action(fn($records) => $records->each->update(['is_active' => true]))
+                        ->action(fn($records) => $records
+                            ->reject(fn(PermitUser $record) => static::shouldPreventSelfDeactivation() && static::isCurrentUserRecord($record))
+                            ->each
+                            ->update(['is_active' => true]))
                         ->deselectRecordsAfterCompletion()
                         ->requiresConfirmation()
                         ->color('success'),
@@ -189,7 +210,10 @@ class PermitUserResource extends Resource
                     BulkAction::make('deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-x-circle')
-                        ->action(fn($records) => $records->each->update(['is_active' => false]))
+                        ->action(fn($records) => $records
+                            ->reject(fn(PermitUser $record) => static::shouldPreventSelfDeactivation() && static::isCurrentUserRecord($record))
+                            ->each
+                            ->update(['is_active' => false]))
                         ->deselectRecordsAfterCompletion()
                         ->requiresConfirmation()
                         ->color('danger'),
@@ -211,5 +235,20 @@ class PermitUserResource extends Resource
             'create' => CreateUser::route('/create'),
             'edit' => EditUser::route('/{record}/edit'),
         ];
+    }
+
+    protected static function isCurrentUserRecord(?PermitUser $record): bool
+    {
+        return $record?->authable?->is(auth()->user()) ?? false;
+    }
+
+    protected static function shouldPreventSelfDeactivation(): bool
+    {
+        return (bool) config('obelaw.permit.user.prevent_self_deactivation', true);
+    }
+
+    protected static function shouldPreventSelfDelete(): bool
+    {
+        return (bool) config('obelaw.permit.user.prevent_self_delete', true);
     }
 }
