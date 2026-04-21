@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Twist\Base\BaseMigration;
+use Obelaw\Twist\Base\BaseMigration;
 
 return new class extends BaseMigration
 {

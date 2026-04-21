@@ -30,7 +30,7 @@ use Obelaw\Permit\Models\PermitGiverRule;
 use Obelaw\Permit\Models\PermitRule;
 use Obelaw\Permit\Models\PermitUser;
 use Obelaw\Permit\Traits\PremitCan;
-use Twist\Tenancy\Concerns\HasDBTenancy;
+use Obelaw\Twist\Tenancy\Concerns\HasDBTenancy;
 
 #[Permissions(
     id: 'permit.admins.viewAny',

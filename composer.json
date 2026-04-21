@@ -12,7 +12,7 @@
         }
     ],
     "require": {
-        "twist/twist": "^4.0"
+        "obelaw/twist": "dev-main"
     },
     "extra": {
         "laravel": {
