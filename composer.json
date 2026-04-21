@@ -13,7 +13,8 @@
     ],
     "require": {
         "obelaw/twist": "dev-main",
-        "obelaw/o-configs": "^1.1"
+        "obelaw/o-configs": "^1.1",
+        "obelaw/trail": "dev-main"
     },
     "extra": {
         "laravel": {

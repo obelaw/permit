@@ -33,10 +33,13 @@ use Obelaw\Permit\Filament\Clusters\PermitCluster;
 use Obelaw\Permit\Filament\Resources\PermitUserResource\CreateUser;
 use Obelaw\Permit\Filament\Resources\PermitUserResource\EditUser;
 use Obelaw\Permit\Filament\Resources\PermitUserResource\ListUser;
+use Obelaw\Permit\Filament\Resources\PermitUserResource\UserTrails;
 use Obelaw\Permit\Models\PermitGiverRule;
 use Obelaw\Permit\Models\PermitRule;
 use Obelaw\Permit\Models\PermitUser;
 use Obelaw\Permit\Traits\PremitCan;
+use Obelaw\Trail\Concerns\HasTrail;
+use Obelaw\Trail\Facades\Trail;
 use Obelaw\Twist\Tenancy\Concerns\HasDBTenancy;
 
 #[Permissions(
@@ -176,6 +179,16 @@ class PermitUserResource extends Resource
                     ->updateStateUsing(fn(?PermitUser $record, bool $state) => $record?->update([
                         'is_suspend' => $state ? now() : null,
                     ]))
+                    ->afterStateUpdated(function (?PermitUser $model) {
+                        if ($model) {
+                            Trail::for($model)
+                                ->by(auth()->user())
+                                ->event('suspend.status.changed')
+                                ->changes($model->getChanges())
+                                ->snapshot($model->getPrevious())
+                                ->save();
+                        }
+                    })
                     ->label('Suspended'),
             ])
             ->filters([
@@ -200,7 +213,9 @@ class PermitUserResource extends Resource
                             return $query;
                         }
 
-                        return $query->whereHas('authable', fn (Builder $authableQuery): Builder =>
+                        return $query->whereHas(
+                            'authable',
+                            fn(Builder $authableQuery): Builder =>
                             $authableQuery->where('email', 'like', "%{$email}%")
                         );
                     }),
@@ -230,6 +245,11 @@ class PermitUserResource extends Resource
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make()->visible(config('obelaw.permit.user.can_create')),
+                Action::make('viewTrails')
+                    ->label('View Trails')
+                    ->icon('heroicon-o-clock')
+                    ->url(fn(PermitUser $record): string => static::getUrl('trails', ['record' => $record]))
+                    ->visible(fn(?PermitUser $record): bool => $record instanceof PermitUser && static::recordHasTrail($record)),
                 Action::make('revokeAppAuthentication')
                     ->label('Revoke App Code')
                     ->icon('heroicon-o-key')
@@ -254,9 +274,10 @@ class PermitUserResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->visible(fn (?PermitUser $record): bool =>
+                    ->visible(
+                        fn(?PermitUser $record): bool =>
                         $record?->authable instanceof HasAppAuthentication
-                        && filled($record->authable->getAppAuthenticationSecret())
+                            && filled($record->authable->getAppAuthenticationSecret())
                     ),
             ])
             ->toolbarActions([
@@ -299,7 +320,19 @@ class PermitUserResource extends Resource
             'index' => ListUser::route('/'),
             'create' => CreateUser::route('/create'),
             'edit' => EditUser::route('/{record}/edit'),
+            'trails' => UserTrails::route('/{record}/trails'),
         ];
+    }
+
+    public static function recordHasTrail(PermitUser $record): bool
+    {
+        $authable = $record->authable;
+
+        if (! $authable instanceof Model) {
+            return false;
+        }
+
+        return in_array(HasTrail::class, class_uses_recursive($authable), true);
     }
 
     protected static function isCurrentUserRecord(?PermitUser $record): bool
