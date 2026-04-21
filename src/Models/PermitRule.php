@@ -30,4 +30,9 @@ class PermitRule extends BaseModel
     {
         return $this->hasMany(PermitGiverRule::class, 'rule_id', 'id');
     }
+
+    public function users()
+    {
+        return $this->hasMany(PermitUser::class, 'rule_id', 'id');
+    }
 }

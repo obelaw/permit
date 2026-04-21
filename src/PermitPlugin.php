@@ -29,6 +29,10 @@ class PermitPlugin extends BaseAddon
             ->discoverPages(
                 in: __DIR__ . DIRECTORY_SEPARATOR . 'Filament' . DIRECTORY_SEPARATOR . 'Pages',
                 for: 'Obelaw\\Permit\\Filament\\Pages'
+            )
+            ->discoverWidgets(
+                in: __DIR__ . DIRECTORY_SEPARATOR . 'Filament' . DIRECTORY_SEPARATOR . 'Widgets',
+                for: 'Obelaw\\Permit\\Filament\\Widgets'
             );
     }
 }

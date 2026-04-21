@@ -224,8 +224,6 @@ class PermitUserResource extends Resource
                         $record?->authable instanceof HasAppAuthentication
                         && filled($record->authable->getAppAuthenticationSecret())
                     ),
-                DeleteAction::make()
-                    ->visible(fn(?PermitUser $record): bool => !static::shouldPreventSelfDelete() || !static::isCurrentUserRecord($record)),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
