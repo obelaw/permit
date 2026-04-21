@@ -3,15 +3,20 @@
 namespace Obelaw\Permit\Filament\Resources;
 
 use App\Models\User;
+use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Auth\MultiFactor\App\AppAuthentication;
+use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthentication;
+use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthenticationRecovery;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
@@ -191,6 +196,34 @@ class PermitUserResource extends Resource
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make()->visible(config('obelaw.permit.user.can_create')),
+                Action::make('revokeAppAuthentication')
+                    ->label('Revoke App Code')
+                    ->icon('heroicon-o-key')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->action(function (PermitUser $record): void {
+                        $authable = $record->authable;
+
+                        if (! ($authable instanceof HasAppAuthentication)) {
+                            return;
+                        }
+
+                        $appAuthentication = app(AppAuthentication::class);
+                        $appAuthentication->saveSecret($authable, null);
+
+                        if ($authable instanceof HasAppAuthenticationRecovery) {
+                            $appAuthentication->saveRecoveryCodes($authable, null);
+                        }
+
+                        Notification::make()
+                            ->title('App authentication code revoked successfully.')
+                            ->success()
+                            ->send();
+                    })
+                    ->visible(fn (?PermitUser $record): bool =>
+                        $record?->authable instanceof HasAppAuthentication
+                        && filled($record->authable->getAppAuthenticationSecret())
+                    ),
                 DeleteAction::make()
                     ->visible(fn(?PermitUser $record): bool => !static::shouldPreventSelfDelete() || !static::isCurrentUserRecord($record)),
             ])
