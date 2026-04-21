@@ -86,6 +86,10 @@ class UserTrails extends Page implements Tables\Contracts\HasTable
             ->query(fn(): Builder => $this->getTableQuery())
             ->heading('User Trails')
             ->columns([
+                TextColumn::make('trailable')
+                    ->label('Trailable')
+                    ->state(fn(Trail $record): string => class_basename((string) $record->trailable_type) . '#' . (string) $record->trailable_id)
+                    ->toggleable(),
                 TextColumn::make('event')
                     ->badge()
                     ->searchable(),
