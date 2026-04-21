@@ -25,6 +25,7 @@ use Obelaw\Permit\Filament\Resources\PermitRuleResource\CreateRule;
 use Obelaw\Permit\Filament\Resources\PermitRuleResource\EditRule;
 use Obelaw\Permit\Filament\Resources\PermitRuleResource\ListRule;
 use Obelaw\Permit\Filament\Resources\PermitRuleResource\RelationManagers\GiverUsersRelation;
+use Obelaw\Permit\Filament\Resources\PermitRuleResource\RelationManagers\ModelAccessRulesRelation;
 use Obelaw\Permit\Models\PermitRule;
 use Obelaw\Permit\Traits\PremitCan;
 use Obelaw\Twist\Tenancy\Concerns\HasDBTenancy;
@@ -132,6 +133,7 @@ class PermitRuleResource extends Resource
     {
         return [
             GiverUsersRelation::class,
+            ModelAccessRulesRelation::class,
         ];
     }
 
