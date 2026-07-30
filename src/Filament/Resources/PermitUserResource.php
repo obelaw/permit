@@ -176,19 +176,24 @@ class PermitUserResource extends Resource
                 ToggleColumn::make('is_suspend')
                     ->disabled(fn(?PermitUser $record): bool => static::shouldPreventSelfDeactivation() && static::isCurrentUserRecord($record))
                     ->getStateUsing(fn(?PermitUser $record): bool => $record?->is_suspend !== null)
-                    ->updateStateUsing(fn(?PermitUser $record, bool $state) => $record?->update([
-                        'is_suspend' => $state ? now() : null,
-                    ]))
-                    ->afterStateUpdated(function (?PermitUser $model) {
-                        if ($model) {
-                            Trail::for($model)
-                                ->by(auth()->user())
-                                ->event('suspend.status.changed')
-                                ->changes($model->getChanges())
-                                ->snapshot($model->getPrevious())
-                                ->save();
-                        }
+                    ->updateStateUsing(function (?PermitUser $record, bool $state) {
+                        $record?->update([
+                            'is_suspend' => $state ? now() : null,
+                        ]);
+
+                        $record->last_active_at = now();
+                        $record->save();
                     })
+                    // ->afterStateUpdated(function (?PermitUser $model) {
+                    //     if ($model) {
+                    //         Trail::for($model)
+                    //             ->by(auth()->user())
+                    //             ->event('suspend.status.changed')
+                    //             ->changes($model->getChanges())
+                    //             ->snapshot($model->getPrevious())
+                    //             ->save();
+                    //     }
+                    // })
                     ->label('Suspended'),
             ])
             ->filters([

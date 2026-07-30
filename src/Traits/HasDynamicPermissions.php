@@ -122,6 +122,78 @@ trait HasDynamicPermissions
     }
 
     /**
+     * Check whether this loaded model instance is accessible to the current user.
+     *
+     * The global scope handles the listing (SQL-level).
+     * Use this method to guard ViewRecord / infolist pages at the PHP level,
+     * so the record can still be fetched with withoutGlobalScope() and then
+     * validated — avoiding a misleading 404 vs a proper 403.
+     *
+     * Wire it up in your Filament Resource:
+     *
+     *   public static function canView(Model $record): bool
+     *   {
+     *       return $record->canAccessRecord();
+     *   }
+     *
+     *   // Override resolveRecordRouteBinding so ViewRecord can load the record
+     *   // even when the global scope would normally exclude it:
+     *   public static function resolveRecordRouteBinding(int|string $key): ?Model
+     *   {
+     *       return static::getModel()::withoutGlobalScope('dynamic_permissions')
+     *           ->find($key);
+     *   }
+     */
+    public function canAccessRecord(): bool
+    {
+        $rules = static::resolveRulesForModel(static::class);
+
+        // No rules configured or wildcard — always accessible
+        if ($rules === null || $rules === '*') {
+            return true;
+        }
+
+        $pass = true;
+
+        foreach ($rules as $index => $rule) {
+            $field   = $rule->field;
+            $boolean = $index === 0 ? 'and' : $rule->boolean;
+
+            // Only allow safe field names before calling getAttribute()
+            if (! preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $field)) {
+                continue;
+            }
+
+            $matches = static::evaluateRule(
+                $this->getAttribute($field),
+                $rule->operator,
+                $rule->value
+            );
+
+            $pass = $boolean === 'or' ? ($pass || $matches) : ($pass && $matches);
+        }
+
+        return $pass;
+    }
+
+    /**
+     * Evaluate a single rule against an attribute value in PHP (no DB hit).
+     */
+    private static function evaluateRule(mixed $actual, string $operator, string $value): bool
+    {
+        return match ($operator) {
+            '='      => (string) $actual === $value,
+            '!='     => (string) $actual !== $value,
+            '>'      => $actual > $value,
+            '<'      => $actual < $value,
+            'like'   => str_contains((string) $actual, str_replace('%', '', $value)),
+            'in'     => in_array((string) $actual, array_map('trim', explode(',', $value)), true),
+            'not_in' => ! in_array((string) $actual, array_map('trim', explode(',', $value)), true),
+            default  => false,
+        };
+    }
+
+    /**
      * Apply a single rule condition using parameter binding (SQL injection safe).
      *
      * Column names are validated via strict regex before being used — they
