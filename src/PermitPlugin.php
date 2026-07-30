@@ -14,8 +14,6 @@ class PermitPlugin extends BaseAddon
         $defaultGuard = config('obelaw.permit.guard');
 
         $panel
-            ->viteTheme('vendor/obelaw/permit/resources/obelaw-permit.css')
-
             ->login(Login::class)
 
             ->authGuard($defaultGuard)
