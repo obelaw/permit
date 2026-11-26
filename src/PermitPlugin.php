@@ -9,31 +9,44 @@ use Obelaw\Twist\Base\BaseAddon;
 
 class PermitPlugin extends BaseAddon
 {
+    protected $enableAuthMiddleware = true;
+
+    public static function make($enableAuthMiddleware = true): static
+    {
+        $instance = app(static::class);
+        $instance->enableAuthMiddleware = $enableAuthMiddleware;
+
+        return $instance;
+    }
+
     public function register(Panel $panel): void
     {
         $defaultGuard = config('obelaw.permit.guard');
 
         $panel
-            ->viteTheme('vendor/obelaw/permit/resources/obelaw-permit.css')
-
             ->login(Login::class)
 
-            ->authGuard($defaultGuard)
-            ->authMiddleware([PermitAuthMiddleware::class])
+            ->authGuard($defaultGuard);
+
+        if ($this->enableAuthMiddleware) {
+            $panel->authMiddleware([PermitAuthMiddleware::class]);
+        }
+
+        $panel
             ->discoverResources(
-                in: __DIR__ . DIRECTORY_SEPARATOR . 'Filament' . DIRECTORY_SEPARATOR . 'Resources',
+                in: __DIR__.DIRECTORY_SEPARATOR.'Filament'.DIRECTORY_SEPARATOR.'Resources',
                 for: 'Obelaw\\Permit\\Filament\\Resources'
             )
             ->discoverClusters(
-                in: __DIR__ . DIRECTORY_SEPARATOR . 'Filament' . DIRECTORY_SEPARATOR . 'Clusters',
+                in: __DIR__.DIRECTORY_SEPARATOR.'Filament'.DIRECTORY_SEPARATOR.'Clusters',
                 for: 'Obelaw\\Permit\\Filament\\Clusters'
             )
             ->discoverPages(
-                in: __DIR__ . DIRECTORY_SEPARATOR . 'Filament' . DIRECTORY_SEPARATOR . 'Pages',
+                in: __DIR__.DIRECTORY_SEPARATOR.'Filament'.DIRECTORY_SEPARATOR.'Pages',
                 for: 'Obelaw\\Permit\\Filament\\Pages'
             )
             ->discoverWidgets(
-                in: __DIR__ . DIRECTORY_SEPARATOR . 'Filament' . DIRECTORY_SEPARATOR . 'Widgets',
+                in: __DIR__.DIRECTORY_SEPARATOR.'Filament'.DIRECTORY_SEPARATOR.'Widgets',
                 for: 'Obelaw\\Permit\\Filament\\Widgets'
             );
     }
