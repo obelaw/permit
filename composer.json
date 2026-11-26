@@ -1,5 +1,8 @@
 {
     "name": "obelaw/permit",
+    "description": "Role and permission management addon for Obelaw Twist.",
+    "type": "library",
+    "license": "MIT",
     "autoload": {
         "psr-4": {
             "Obelaw\\Permit\\": "src/"
@@ -7,14 +10,15 @@
     },
     "authors": [
         {
-            "name": "Karim Mohamed",
-            "email": "komicho1996@gmail.com"
+            "name": "Obelaw Team",
+            "email": "consulting@obelaw.com"
         }
     ],
     "require": {
-        "obelaw/twist": "dev-main",
+        "php": "^8.2",
         "obelaw/o-configs": "^1.1",
-        "obelaw/trail": "dev-main"
+        "obelaw/trail": "^1.0",
+        "obelaw/twist": "^1.2"
     },
     "extra": {
         "laravel": {
@@ -23,6 +27,6 @@
             ]
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true
 }
