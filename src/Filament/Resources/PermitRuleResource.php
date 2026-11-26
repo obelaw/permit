@@ -28,7 +28,7 @@ use Obelaw\Permit\Filament\Resources\PermitRuleResource\RelationManagers\GiverUs
 use Obelaw\Permit\Filament\Resources\PermitRuleResource\RelationManagers\ModelAccessRulesRelation;
 use Obelaw\Permit\Models\PermitRule;
 use Obelaw\Permit\Traits\PremitCan;
-use Obelaw\Twist\Tenancy\Concerns\HasDBTenancy;
+use Obelaw\Twist\Base\BaseResource;
 
 #[Permissions(
     id: 'permit.rules.viewAny',
@@ -40,10 +40,11 @@ use Obelaw\Twist\Tenancy\Concerns\HasDBTenancy;
         'permit.rules.delete' => 'Can Delete',
     ]
 )]
-class PermitRuleResource extends Resource
+class PermitRuleResource extends BaseResource
 {
     use PremitCan;
-    use HasDBTenancy;
+
+    protected static bool $isScopedToTenant = false;
 
     protected static ?array $canAccess = [
         'can_viewAny' => 'permit.rules.viewAny',

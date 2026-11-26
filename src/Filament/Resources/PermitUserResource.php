@@ -40,7 +40,7 @@ use Obelaw\Permit\Models\PermitUser;
 use Obelaw\Permit\Traits\PremitCan;
 use Obelaw\Trail\Concerns\HasTrail;
 use Obelaw\Trail\Facades\Trail;
-use Obelaw\Twist\Tenancy\Concerns\HasDBTenancy;
+use Obelaw\Twist\Base\BaseResource;
 
 #[Permissions(
     id: 'permit.admins.viewAny',
@@ -52,10 +52,11 @@ use Obelaw\Twist\Tenancy\Concerns\HasDBTenancy;
         'permit.admins.delete' => 'Can Delete',
     ]
 )]
-class PermitUserResource extends Resource
+class PermitUserResource extends BaseResource
 {
     use PremitCan;
-    use HasDBTenancy;
+
+    protected static bool $isScopedToTenant = false;
 
     protected static ?array $canAccess = [
         'can_viewAny' => 'permit.admins.viewAny',
